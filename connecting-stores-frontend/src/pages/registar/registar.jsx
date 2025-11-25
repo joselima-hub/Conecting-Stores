@@ -26,7 +26,7 @@ export default function Registar() {
         className="bg-white shadow-lg rounded-2xl p-8 w-96"
       >
         <h1 className="text-2xl font-semibold mb-6 text-center">
-          Login
+          Registar
         </h1>
         <input
           type="email"

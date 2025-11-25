@@ -1,21 +1,27 @@
 import React from 'react';
-import { useState } from "react";
-import axios from "axios";
+import { useState } from 'react';
+import { loginRequest } from '../../api/auth-api';
+import { useAuthStore } from '../../context/auth-store/auth-store';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const authLogin = useAuthStore((state) => state.login);
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
+
     try {
-      const res = await axios.post("http://localhost:4000/api/auth/login", {
-        email,
-        password,
-      });
-      console.log("✅ Logged in:", res.data);
+      const { token, user } = await loginRequest(email, password);
+      authLogin(user, token);
+      navigate('/dashboard');
     } catch (err) {
-      console.error("❌ Login failed:", err.response?.data || err.message);
+      setError(`Login failed: ${err.response?.data || err.message}`);
     }
   };
 
@@ -25,9 +31,14 @@ export default function Login() {
         onSubmit={handleLogin}
         className="bg-white shadow-lg rounded-2xl p-8 w-96"
       >
-        <h1 className="text-2xl font-semibold mb-6 text-center">
-          Login
-        </h1>
+        <h1 className="text-2xl font-semibold mb-6 text-center">Login</h1>
+        
+        {error && (
+          <div className="bg-red-200 text-red-700 p-2 rounded mb-4">
+            {error}
+          </div>
+        )}
+
         <input
           type="email"
           placeholder="Email"
